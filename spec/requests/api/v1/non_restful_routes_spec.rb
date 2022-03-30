@@ -10,6 +10,26 @@ RSpec.describe 'non-restful' do
                 response_info = JSON.parse(response.body, symbolize_names: true)
                 expect(response_info[:data][:attributes][:name]).to eq("aaron")
             end
+            it 'will find the first merchant object alphabetically that matches a search term' do 
+                create(:merchant, name: 'apple')
+                create(:merchant, name: 'aaron')
+                get '/api/v1/merchants/find?name=Aaa'
+                response_info = JSON.parse(response.body, symbolize_names: true)
+                expect(response_info[:data][:error]).to eq("null")
+            end
+        end
+        describe '/find_all' do 
+                it 'will find all merchant objects that matches a search term ' do 
+                create(:merchant, name: 'apple')
+                create(:merchant, name: 'aaron')
+                create(:merchant, name: 'bill')
+                get '/api/v1/merchants/find_all?name=A'
+                response_info = JSON.parse(response.body, symbolize_names: true)
+                expect(response_info[:data].count).to eq(2)
+                expect(response_info[:data][0][:attributes][:name]).to eq('aaron')
+                expect(response_info[:data][1][:attributes][:name]).to eq('apple')
+            end
+
         end
     end
     describe 'item querying ' do 
@@ -21,6 +41,11 @@ RSpec.describe 'non-restful' do
                     get '/api/v1/items/find?name=A'
                     response_info = JSON.parse(response.body, symbolize_names: true)
                     expect(response_info[:data][:attributes][:name]).to eq("apple")
+                end
+                it 'will return null if no items match' do 
+                    get '/api/v1/items/find?name=A'
+                    response_info = JSON.parse(response.body, symbolize_names: true)
+                    expect(response_info[:data][:error]).to eq("null")
                 end
             end
             describe 'price queries' do  
@@ -52,7 +77,7 @@ RSpec.describe 'non-restful' do
                 it 'will return an error if not found' do 
                     get '/api/v1/items/find?min_price=15&max_price=30'
                     response_info = JSON.parse(response.body, symbolize_names: true)
-                    expect(response_info[:error]).to eq('not found')
+                    expect(response_info[:data][:error]).to eq('null')
                 end
                 it 'will return an error if both name and price params are passed' do 
                     get '/api/v1/items/find?min_price=15&name=ap'
@@ -111,7 +136,7 @@ RSpec.describe 'non-restful' do
                     it 'will return not found if no records match the params' do 
                         get '/api/v1/items/find_all?max_price=3'
                         response_info = JSON.parse(response.body, symbolize_names: true)
-                        expect(response_info[:error]).to eq('not found')
+                        expect(response_info[:data][:error]).to eq('null')
                     end
                 end
             end

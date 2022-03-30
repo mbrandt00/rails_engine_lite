@@ -59,11 +59,17 @@ RSpec.describe "Item API" do
         expect(response_info[:error]).to eq("bad request")
         
     end
-    it 'can edit an item' do 
+    it 'can update an item' do 
         item = create(:item, name: 'Wrong name')
         patch "/api/v1/items/#{item.id}", params: {name: 'Correct name'}
         response_info = JSON.parse(response.body, symbolize_names: true) 
         expect(response_info[:data][:attributes][:name]).to eq('Correct name')
+    end
+    it 'will return an error if an item cannot be updated because of bad input' do 
+        item = create(:item)
+        patch "/api/v1/items/#{item.id}", params: {unit_price: 'One thousand dollars'}
+        response_info = JSON.parse(response.body, symbolize_names: true) 
+        expect(response_info[:error][:unit_price]).to eq(['is not a number'])
     end
     it 'will return an error if the item cannot be valid if its not found' do 
         item = create(:item, name: 'Wrong name')

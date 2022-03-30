@@ -16,12 +16,12 @@ class Api::V1::ItemsController < ApplicationController
             render json: { error: 'bad request' }, status: :bad_request
         end
     end
-
+    #here do i went {like #16 or more information}
     def update
         if @item.update(item_params)
             render json: ItemSerializer.new(@item)
         else 
-            render json: @item.errors, status: :bad_request
+            render json: {error: @item.errors}, status: :bad_request
         end
     end
 
