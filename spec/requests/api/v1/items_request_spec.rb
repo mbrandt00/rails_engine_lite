@@ -15,17 +15,16 @@ RSpec.describe "Item API" do
         get '/api/v1/items'
         expect(response).to be_successful
         all_items = JSON.parse(response.body, symbolize_names: true) 
-        expect(all_items.count).to eq(6)
-        
-        all_items.each do |item|
-            expect(item).to have_key(:name)
-            expect(item[:name]).to be_a(String)
-            expect(item).to have_key(:description)
-            expect(item[:description]).to be_a(String)
-            expect(item).to have_key(:unit_price)
-            expect(item[:unit_price]).to be_a(Float)
-            expect(item).to have_key(:merchant_id)
-            expect(item[:merchant_id]).to be_an(Integer)
+        expect(all_items[:data].count).to eq(6)
+        all_items[:data].each do |item|
+            expect(item[:attributes]).to have_key(:name)
+            expect(item[:attributes][:name]).to be_a(String)
+            expect(item[:attributes]).to have_key(:description)
+            expect(item[:attributes][:description]).to be_a(String)
+            expect(item[:attributes]).to have_key(:unit_price)
+            expect(item[:attributes][:unit_price]).to be_a(Float)
+            expect(item[:attributes]).to have_key(:merchant_id)
+            expect(item[:attributes][:merchant_id]).to be_an(Integer)
         end
     end
     it 'can get one item' do 
@@ -33,15 +32,16 @@ RSpec.describe "Item API" do
         get "/api/v1/items/#{item.id}"
         expect(response).to be_successful
         item_info = JSON.parse(response.body, symbolize_names: true) 
+        item_info = item_info[:data]
         expect(item_info).to be_a(Hash)
-        expect(item_info).to have_key(:name)
-        expect(item_info[:name]).to be_a(String)
-        expect(item_info).to have_key(:description)
-        expect(item_info[:description]).to be_a(String)
-        expect(item_info).to have_key(:unit_price)
-        expect(item_info[:unit_price]).to be_a(Float)
-        expect(item_info).to have_key(:merchant_id)
-        expect(item_info[:merchant_id]).to be_an(Integer)
+        expect(item_info[:attributes]).to have_key(:name)
+        expect(item_info[:attributes][:name]).to be_a(String)
+        expect(item_info[:attributes]).to have_key(:description)
+        expect(item_info[:attributes][:description]).to be_a(String)
+        expect(item_info[:attributes]).to have_key(:unit_price)
+        expect(item_info[:attributes][:unit_price]).to be_a(Float)
+        expect(item_info[:attributes]).to have_key(:merchant_id)
+        expect(item_info[:attributes][:merchant_id]).to be_an(Integer)
     end
     it 'will create a new book' do 
         expect(Item.all.count).to eq(0)
@@ -52,17 +52,25 @@ RSpec.describe "Item API" do
     end
     it 'will return an error if post is not valid' do 
         merchant = create(:merchant)
-        post '/api/v1/items', params: {description: 'A lovely widget', unit_price: 10.0, merchant_id: merchant.id}
+        # no name
+        post '/api/v1/items', params: {description: 'A lovely widget', unit_price: '3', merchant_id: merchant.id}
         response_info = JSON.parse(response.body, symbolize_names: true) 
-        expect(response_info).to have_key(:message)
-        expect(response_info.values_at(:message)).to include("Validation failed")
+        expect(response_info).to have_key(:error)
+        expect(response_info[:error]).to eq("bad request")
         
     end
     it 'can edit an item' do 
         item = create(:item, name: 'Wrong name')
         patch "/api/v1/items/#{item.id}", params: {name: 'Correct name'}
         response_info = JSON.parse(response.body, symbolize_names: true) 
-        expect(response_info[:name]).to eq('Correct name')
+        expect(response_info[:data][:attributes][:name]).to eq('Correct name')
+    end
+    it 'will return an error if the item cannot be valid if its not found' do 
+        item = create(:item, name: 'Wrong name')
+        put "/api/v1/items/#{item.id+1}", params: {name: 'Correct name'}
+        response_info = JSON.parse(response.body, symbolize_names: true)
+        expect(response_info[:error]).to eq('not found')
+
     end
     it 'can delete an item' do 
         item = create(:item, name: 'Wrong name')
@@ -74,7 +82,7 @@ RSpec.describe "Item API" do
         item = create(:item, name: 'item a', merchant_id: merchant.id)
         get "/api/v1/items/#{item.id}/merchant"
         response_info = JSON.parse(response.body, symbolize_names: true) 
-        expect(response_info).to have_key(:name)
-        expect(response_info[:name]).to eq('Best Buy')
+        expect(response_info[:data][:attributes]).to have_key(:name)
+        expect(response_info[:data][:attributes][:name]).to eq('Best Buy')
     end
 end

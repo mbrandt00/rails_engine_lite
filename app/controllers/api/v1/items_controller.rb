@@ -1,42 +1,45 @@
 class Api::V1::ItemsController < ApplicationController
-    before_action :set_item, only: %i[ show update destroy merchant ]
-    def index 
-        render json: Item.all
+    before_action :set_item, only: %i[ show update destroy ]
+    def index
+        render json: ItemSerializer.new(Item.all)
     end
 
-    def show 
-        render json: @item
+    def show
+        render json: ItemSerializer.new(@item)
     end
-    def create 
+
+    def create
         item = Item.create(item_params)
         if item.save
-            render json: item
+            render json: ItemSerializer.new(item)
         else 
-            render json: { message: "Validation failed", errors: item.errors}
+            render json: { error: 'bad request' }, status: :bad_request
         end
     end
 
-    def update 
+    def update
         if @item.update(item_params)
-            render json: @item
-        else
-            render json: @item.errors, status: :unprocessable_entity
+            render json: ItemSerializer.new(@item)
+        else 
+            render json: @item.errors, status: :bad_request
         end
     end
-    def destroy 
+
+    def destroy
         @item.destroy
+        head :no_content
     end
 
-    def merchant 
-        render json: @item.merchant
-    end
-
-    private 
+    private
 
     def item_params
         params.permit(:name, :description, :unit_price, :merchant_id)
     end
+
     def set_item
-      @item = Item.find(params[:id])
+        @item = Item.find(params[:id])
+        rescue ActiveRecord::RecordNotFound
+            render json: { error: 'not found' }, status: :not_found
     end
+  
 end
