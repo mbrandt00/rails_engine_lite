@@ -42,7 +42,7 @@ RSpec.describe 'non-restful' do
             it 'will return an error if no params are passed' do 
                 get '/api/v1/merchants/find_all'
                 response_info = JSON.parse(response.body, symbolize_names: true)
-                expect(response_info[:data][:error]).to eq("null")
+                expect(response_info[:error]).to eq("null")
             end
         end
     end
