@@ -21,4 +21,12 @@ class Api::V1::Merchants::SearchController < ApplicationController
       render json: {error: :null, data: []}, status: :bad_request
     end
   end
+
+  def most_items
+     if params[:quantity].present? && params[:quantity].to_i > 0
+      render json: MerchantItemsNameSerializer.new(Merchant.most_items(params[:quantity]))
+     else 
+      render json: {error: 'bad request'}, status: :bad_request
+    end
+  end
 end

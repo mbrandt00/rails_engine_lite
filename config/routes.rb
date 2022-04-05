@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       namespace :merchants do
         get '/find_all', to: 'search#index'
         get '/find', to: 'search#show'
+        get '/most_items', to: 'search#most_items'
       end
       resources :merchants, only: [:index, :show] do
         resources :items, only: [:index], module: :merchants
@@ -17,6 +18,11 @@ Rails.application.routes.draw do
       resources :items do
         resources :merchant, only: [:index]
       end
+      namespace :revenue do 
+        resources :merchants, only: [:index]
+        resources :items, only: [:index]
+      end
+      get '/revenue', to: 'revenue/merchants#total_revenue'
     end
   end
 end
