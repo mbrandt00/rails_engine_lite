@@ -1,6 +1,5 @@
 class RegistrationsController < ApplicationController
     def create 
-        binding.pry
         user = User.create!(
             email: params[:email], 
             password: params[:password], 
@@ -16,5 +15,4 @@ class RegistrationsController < ApplicationController
             render json: {status: 500}
         end
     end
-
 end
