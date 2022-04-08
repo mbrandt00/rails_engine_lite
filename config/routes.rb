@@ -22,11 +22,12 @@ Rails.application.routes.draw do
         resources :merchants, only: [:index]
         resources :items, only: [:index]
       end
+      resources :invoices
       get '/revenue', to: 'revenue/merchants#total_revenue'
+      resources :sessions, only: [:create]
+      resources :registrations, only: [:create]
+      delete :logout, to: "sessions#logout" 
+      get :logged_in, to: "sessions#logged_in"
     end
   end
-  resources :sessions, only: [:create]
-  resources :registrations, only: [:create]
-  delete :logout, to: "sessions#logout" 
-  get :logged_in, to: "sessions#logged_in"
 end
