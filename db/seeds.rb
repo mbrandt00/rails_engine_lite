@@ -1,4 +1,23 @@
-cmd = "pg_restore --verbose --clean --no-acl --no-owner -h localhost -U $(whoami) -d rails-engine_development db/data/rails-engine-development.pgdump"
-puts "Loading PostgreSQL Data dump into local database with command:"
-puts cmd
-system(cmd)
+require 'factory_bot_rails'
+
+20.times do 
+    customers = FactoryBot.create(:user, type_of_user: 0)
+    merchants = FactoryBot.create(:user, type_of_user: 1)
+end
+1000.times do 
+    merchant = Merchant.all.sample(1).first
+    FactoryBot.create(:item, merchant: merchant)
+end
+
+100.times do 
+    customer = Customer.all.sample(1).first 
+    FactoryBot.create(:invoice, customer: customer)
+end
+
+1000.times do 
+    invoice = Invoice.all.sample(1).first 
+    rand(1..5).times do 
+        item = Item.all.sample(1).first
+        FactoryBot.create(:invoice_item, invoice: invoice, item: item)
+    end
+end
