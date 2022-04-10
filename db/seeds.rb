@@ -2,7 +2,7 @@ require 'factory_bot_rails'
 
 20.times do 
     customers = FactoryBot.create(:user, type_of_user: 0)
-    merchants = FactoryBot.create(:user, type_of_user: 1)
+    merchants = FactoryBot.create(:user, type_of_user: 1, password: 'admin')
 end
 1000.times do 
     merchant = Merchant.all.sample(1).first

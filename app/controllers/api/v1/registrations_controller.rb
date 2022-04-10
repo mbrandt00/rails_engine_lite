@@ -3,7 +3,8 @@ class Api::V1::RegistrationsController < ApplicationController
         user = User.create!(
             email: params[:email], 
             password: params[:password], 
-            password_confirmation: params[:password_confirmation]
+            password_confirmation: params[:password_confirmation],
+            type_of_user: params[:type_of_user].downcase
         )
         if user 
             session[:user_id] = user.id 

@@ -1,11 +1,19 @@
 class Api::V1::ItemsController < ApplicationController
+    # before_action :is_customer?
     before_action :set_item, only: %i[ show update destroy ]
     def index
         render json: ItemSerializer.new(Item.all)
     end
 
     def show
-        render json: ItemSerializer.new(@item)
+        # two different views for merchant and customer. 
+        # Customer can add item + quantity to invoice 
+        # Merchant can delete/update item
+        if current_user.type_of_user == 'customer' 
+            render json: ItemSerializer.new(@item)
+        elsif current_user.type_of_user == 'merchant' 
+           binding.pry # Item changes here 
+        end
     end
 
     def create
@@ -41,5 +49,9 @@ class Api::V1::ItemsController < ApplicationController
         rescue ActiveRecord::RecordNotFound
             render json: { error: 'not found' }, status: :not_found
     end
+    # private 
+    # def is_customer?
+    #     render json: {error: 'Access denied'}, status: :forbidden if current_user.try(:customer).nil?
+    # end
   
 end

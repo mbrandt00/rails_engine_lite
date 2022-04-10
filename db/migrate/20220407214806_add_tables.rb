@@ -13,7 +13,7 @@ class AddTables < ActiveRecord::Migration[5.2]
 
       create_table 'invoice_items', force: :cascade do |t|
         t.integer 'quantity'
-        t.integer 'unit_price'
+        t.float 'unit_price'
         t.integer 'status', default: 0
         t.datetime 'created_at'
         t.datetime 'updated_at'
@@ -34,7 +34,7 @@ class AddTables < ActiveRecord::Migration[5.2]
       create_table 'items', force: :cascade do |t|
         t.string 'name'
         t.string 'description'
-        t.integer 'unit_price'
+        t.float 'unit_price'
         t.datetime 'created_at'
         t.datetime 'updated_at'
         t.bigint 'merchant_id'
